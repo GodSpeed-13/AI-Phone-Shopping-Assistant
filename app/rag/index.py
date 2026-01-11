@@ -7,7 +7,13 @@ with open("app/data/phones.json") as f:
     phones = json.load(f)
 
 documents = [
-    f"{p['brand']} {p['model']} priced at ₹{p['price']} with {p['camera']} camera, {p['battery']} battery."
+    (
+        f"{p['brand']} {p['model']} is priced at ₹{p['price']}. "
+        f"It features a {p['display']} display, powered by the {p['processor']} processor. "
+        f"The phone offers a {p['camera']} camera setup and a {p['battery']} battery "
+        f"with {p['charging']} charging support. "
+        f"Key features include {', '.join(p['features'])}."
+    )
     for p in phones
 ]
 
