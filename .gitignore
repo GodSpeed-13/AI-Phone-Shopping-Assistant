@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+*.log
+*.index
+app/data/faiss.index
+node_modules/
+.DS_Store

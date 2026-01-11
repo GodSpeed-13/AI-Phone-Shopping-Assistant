@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Phone Shopping Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+
+      background:
+        linear-gradient(
+          rgba(15, 23, 42, 0.75),
+          rgba(15, 23, 42, 0.75)
+        ),
+        url("assets/bg.png");
+
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4f46e5;
+    }
+
+    .message {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .price {
+      color: #22c55e;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .spec {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    .why {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        background-attachment: scroll;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🤖 AI Phone Shopping Assistant</h1>
+
+    <div class="chat-box">
+      <input id="query" placeholder="Ask about phones (e.g. Best camera phone under 30000)" />
+      <button onclick="send()">Ask</button>
+    </div>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    async function send() {
+      const q = document.getElementById("query").value;
+      if (!q) return;
+
+      const container = document.getElementById("output");
+      container.innerHTML = "<p>🔍 Finding the best phones for you...</p>";
+
+      const res = await fetch("/chat/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: q })
+      });
+
+      const data = await res.json();
+      renderResponse(data);
+    }
+
+    function renderResponse(data) {
+      const container = document.getElementById("output");
+      container.innerHTML = "";
+
+      const messageEl = document.createElement("div");
+      messageEl.className = "message";
+      messageEl.innerText = data.message;
+      container.appendChild(messageEl);
+
+      if (!data.recommendations || data.recommendations.length === 0) {
+        container.innerHTML += "<p>No recommendations available.</p>";
+        return;
+      }
+
+      const cards = document.createElement("div");
+      cards.className = "cards";
+
+      data.recommendations.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <h3>${r.name}</h3>
+          <div class="price">${r.price}</div>
+          <div class="spec">📷 Camera: ${r.camera}</div>
+          <div class="spec">🔋 Battery: ${r.battery}</div>
+          <div class="why">💡 ${r.reason}</div>
+        `;
+
+        cards.appendChild(card);
+      });
+
+      container.appendChild(cards);
+    }
+  </script>
+</body>
+</html>
